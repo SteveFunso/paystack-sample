@@ -59,8 +59,8 @@ const html = `
 `;
 
 const router = express();
-var jsonParser = bodyParser.json();
-var urlencodedParser = bodyParser.urlencoded({ extended: false });
+// var jsonParser = bodyParser.json();
+// var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
 router.get("/new-access-code", function (req, res) {
   // var customerid = req.params.customerid;
