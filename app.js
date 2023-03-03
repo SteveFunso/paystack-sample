@@ -3,10 +3,9 @@ require("dotenv").config();
 const paystack = require("paystack")(process.env.PAYSTACK_KEY);
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT;
 
 app.get("/", (req, res) => res.type("html").send(html));
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 const html = `
 <!DOCTYPE html>
 <html>
@@ -189,9 +188,13 @@ router.get("/wallet/:email", function (req, res) {
   });
 });
 
-const server = router.listen(process.env.PORT || 5003, () => {
-  const port = server.address().port;
-  console.log(`Express is working on port ${port}`);
-});
+// const server = router.listen(process.env.port, () => {
+//   const port = server.address().port;
+//   console.log(`Express is working on port ${port}`);
+// });
+
+router.listen(port, () =>
+  console.log(`Example app listening on port ${port}!`)
+);
 
 //https://unifia.herokuapp.com/confirm-purchase?invoice_no=67
