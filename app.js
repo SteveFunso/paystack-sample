@@ -1,17 +1,17 @@
 const express = require("express");
+require("dotenv").config();
+const paystack = require("paystack")(process.env.PAYSTACK_KEY);
+
 const app = express();
 const port = process.env.PORT || 3001;
 
-app.get("/", (req, res) => res.type('html').send(html));
-
+app.get("/", (req, res) => res.type("html").send(html));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
-
-
 const html = `
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Hello from Render!</title>
+    <title>Hello from STEPHEN!</title>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
       setTimeout(() => {
@@ -56,4 +56,142 @@ const html = `
     </section>
   </body>
 </html>
-`
+`;
+
+const router = express();
+var jsonParser = bodyParser.json();
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
+
+router.get("/new-access-code", function (req, res) {
+  // var customerid = req.params.customerid;
+  // var cartid = req.params.cartid;
+
+  // you can then look up customer and cart details in a db etc
+  // I'm hardcoding an email here for simplicity
+  amountinkobo = process.env.TEST_AMOUNT * 100;
+
+  if (isNaN(amountinkobo) || amountinkobo < 2500) {
+    amountinkobo = 2500;
+  }
+  email = process.env.SAMPLE_EMAIL;
+
+  // all fields supported by this call can be gleaned from
+  // https://developers.paystack.co/reference#initialize-a-transaction
+  paystack.transaction.initialize(
+    {
+      email: email, // a valid email address
+      amount: amountinkobo, // only kobo and must be integer
+      metadata: {
+        custom_fields: [
+          {
+            display_name: "Started From",
+            variable_name: "started_from",
+            value: "sample charge card backend",
+          },
+          {
+            display_name: "Requested by",
+            variable_name: "requested_by",
+            value: req.headers["user-agent"],
+          },
+          {
+            display_name: "Server",
+            variable_name: "server",
+            value: req.headers.host,
+          },
+        ],
+      },
+    },
+    function (error, body) {
+      if (error) {
+        res.send({ error: error });
+        return;
+      }
+      res.send(body.data.access_code);
+    }
+  );
+});
+router.post("/get-reference", function (req, res) {
+  console.log(req.body);
+  console.log(Date.now());
+
+  let amount = req.body?.amount ? req.body.amount : 1000;
+  let email = req.body?.email ? req.body.email : "example@gmail.com";
+
+  //unifia-airtime-app.herokuapp.com/generate-reference
+  // you can then look up customer and cart details in a db etc
+  // I'm hardcoding an email here for simplicity
+  //amountinkobo = process.env.TEST_AMOUNT * 100;
+  https: amountinkobo = amount * 100;
+  if (isNaN(amountinkobo) || amountinkobo < 2500) {
+    amountinkobo = 2500;
+  }
+  // all fields supported by this call can be gleaned from
+  // https://developers.paystack.co/reference#initialize-a-transaction
+  console.log("All fields supported by this call can be");
+  paystack.transaction.initialize(
+    {
+      email: email, // a valid email address
+      amount: amountinkobo, // only kobo and must be integer
+      metadata: {
+        custom_fields: [
+          {
+            display_name: "Started From",
+            variable_name: "started_from",
+            value: "sample charge card backend",
+          },
+          {
+            display_name: "Requested by",
+            variable_name: "requested_by",
+            value: req.headers["user-agent"],
+          },
+          {
+            display_name: "Server",
+            variable_name: "server",
+            value: req.headers.host,
+          },
+        ],
+      },
+    },
+    function (error, body) {
+      if (error) {
+        res.send({ error: error });
+        return;
+      }
+      res.send({ ...body });
+    }
+  );
+});
+
+router.get("/verify/:reference", function (req, res) {
+  var reference = req.params.reference;
+  console.log(req.params);
+  console.log(Date.now());
+  paystack.transaction.verify(reference, function (error, body) {
+    if (error) {
+      res.send({ error: error });
+      return;
+    }
+    if (body.data.success) {
+      // save authorization
+      var auth = body.authorization;
+    }
+    res.send({
+      ...body,
+    });
+  });
+});
+
+router.get("/wallet/:email", function (req, res) {
+  var email = req.params.email;
+  res.send({
+    balance: 2000,
+    email,
+  });
+});
+
+const server = router.listen(process.env.PORT || 5003, () => {
+  const port = server.address().port;
+  console.log(`Express is working on port ${port}`);
+});
+
+//https://unifia.herokuapp.com/confirm-purchase?invoice_no=67
