@@ -2,10 +2,10 @@ const express = require("express");
 require("dotenv").config();
 const paystack = require("paystack")(process.env.PAYSTACK_KEY);
 
-const app = express();
+const router = express();
 const port = process.env.PORT;
 
-app.get("/", (req, res) => res.type("html").send(html));
+router.get("/", (req, res) => res.type("html").send(html));
 const html = `
 <!DOCTYPE html>
 <html>
@@ -57,7 +57,6 @@ const html = `
 </html>
 `;
 
-const router = express();
 // var jsonParser = bodyParser.json();
 // var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
